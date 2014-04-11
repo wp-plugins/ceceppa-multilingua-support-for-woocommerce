@@ -42,7 +42,8 @@ Installation of this plugin is fairly easy:
 
 == Screenshots ==
 
-
+1. Product title translation
+2. Product short description translation
 
 == Changelog ==
 
