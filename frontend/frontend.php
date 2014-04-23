@@ -8,10 +8,12 @@ class Cml4WoocommerceFrontend extends Cml4Woocommerce {
     parent::__construct();
 
     //Translate product link
-    add_filter( 'post_type_link', array( & $this, 'translate_product_link' ), 10, 4 );
+    if( get_option( 'cmlwoo_translate_permalink', 1 ) ) {
+      add_filter( 'post_type_link', array( & $this, 'translate_product_link' ), 10, 4 );
 
-    //Tell to wp the original product name :)
-    add_filter( 'pre_get_posts', array( & $this, 'change_product_name' ), 0, 1 );
+      //Tell to wp the original product name :)
+      add_filter( 'pre_get_posts', array( & $this, 'change_product_name' ), 0, 1 );
+    }
 
     //Product translations
     add_filter( 'the_title', array( & $this, 'get_translated_title' ), 0, 2 );
@@ -100,7 +102,10 @@ class Cml4WoocommerceFrontend extends Cml4Woocommerce {
     unset( $url[ count( $url ) - 1 ] );
 
     //Get translated title
-    $title = $this->get_translated_title( $post->post_title, $post->ID );
+    $title = CMLTranslations::get( $lang, "_{$post->post_type}_" . $post->ID, "_woo_", true );
+    if( empty( $title ) ) {
+      $title = $this->get_translated_title( $post->post_title, $post->ID );
+    }
 
     $url[] = strtolower( sanitize_title( $title ) );
 
@@ -176,6 +181,8 @@ class Cml4WoocommerceFrontend extends Cml4Woocommerce {
   }
     
   function get_translated_cat_slug( $args ) {
+    if( ! defined( 'CECEPPA_DB_VERSION' ) ) return $args;
+
     $lang = CMLUtils::_get( "_forced_language_id", CMLLanguage::get_current_id() );
     if( CMLLanguage::is_default( $lang ) ) return $args;
 
@@ -194,6 +201,8 @@ class Cml4WoocommerceFrontend extends Cml4Woocommerce {
   }
   
   function get_translated_tag_slug( $args ) {
+    if( ! defined( 'CECEPPA_DB_VERSION' ) ) return $args;
+
     $lang = CMLUtils::_get( "_forced_language_id", CMLLanguage::get_current_id() );
     if( CMLLanguage::is_default( $lang ) ) return $args;
 

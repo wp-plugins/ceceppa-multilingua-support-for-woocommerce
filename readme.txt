@@ -47,5 +47,10 @@ Installation of this plugin is fairly easy:
 
 == Changelog ==
 
+= 0.2 =
+* Allow permalink customization for each language
+* Added option to disable product permalink translation
+* Added error when Product category or tag base is empty
+
 = 0.1 =
 * First release

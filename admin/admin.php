@@ -12,6 +12,8 @@ class Cml4WoocommerceAdmin extends Cml4Woocommerce {
         new Cml4WoocommercePermalink();
       }
 
+      add_action( 'wp_ajax_cmlwoo_save_permalink', array( & $this, 'save_permalink' ) );
+
       add_action( 'admin_notices', array( & $this, 'admin_notices' ) );
       add_action( 'admin_init', array( & $this, 'add_meta_box' ) );
   
@@ -55,7 +57,7 @@ class Cml4WoocommerceAdmin extends Cml4Woocommerce {
 	function register_addon( & $addons ) {
       $addon = array(
                                   'addon' => 'woocommerce',
-                                  'title' => 'Woocommerce',
+                                  'title' => 'WooCommerce',
                                   );
       $addons[] = $addon;
 
@@ -69,7 +71,7 @@ class Cml4WoocommerceAdmin extends Cml4Woocommerce {
 echo <<< EOT
 	<div class="error">
 		<p>
-			<strong>Ceceppa Multilingua for Woocommerce</strong>
+			<strong>Ceceppa Multilingua for WooCommerce</strong>
 			<br /><br />
 			Hi there!	I'm just an addon for <a href="http://wordpress.org/plugins/ceceppa-multilingua/">Ceceppa Multilingua</a>, I can't work alone :(
 		</p>
@@ -84,18 +86,48 @@ EOT;
       <div class="updated">
         <p>
 <?php
-        printf( __( 'Click <%s>here</a> to translate attributes name', 'cml4woo' ),
+        printf( __( 'Click <%s>here</a> to translate attributes nameranslate product ', 'cml4woo' ),
                        'a href="' . admin_url() . 'admin.php?page=ceceppaml-translations-page&tab=_cml4woo_attr" class="button"' );
 ?>
         </p>
       </div>
 <?php
       }
+      
+      //Empty base structure ( permalink )
+      $woop = get_option( 'woocommerce_permalinks', array() );
+      if( ! isset( $woop[ 'category_base' ] ) || empty( $woop[ 'category_base' ] ) ) {
+?>
+	<div class="error">
+		<p>
+			<strong>Ceceppa Multilingua for WooCommerce</strong>
+			<br /><br />
+			<?php _e( 'Product category base field cannot be empty', 'cml4woo' ); ?>.
+            <?php printf( __( 'Click <%s>here</a> to fix', 'cml4woo' ),
+                         'a href="' . admin_url() . 'options-permalink.php" class="button"' ) ?>
+		</p>
+	</div>
+<?php
+      }
+
+      if( ! isset( $woop[ 'tag_base' ] ) || empty( $woop[ 'tag_base' ] ) ) {
+?>
+	<div class="error">
+		<p>
+			<strong>Ceceppa Multilingua for WooCommerce</strong>
+			<br /><br />
+			<?php _e( 'Product tag base field cannot be empty', 'cml4woo' ); ?>.
+            <?php printf( __( 'Click <%s>here</a> to fix', 'cml4woo' ),
+                         'a href="' . admin_url() . 'options-permalink.php" class="button"' ) ?>
+		</p>
+	</div>
+<?php
+      }
 	}
 
 	function add_meta_box() {
       add_meta_box( 'cml-box-cml4woo-addons', 
-                                  __( 'Woocommerce', 'woocommerce' ), 
+                                  __( 'WooCommerce', 'woocommerce' ), 
                                   array( & $this, 'meta_box' ), 
                                   'cml_box_addons_woocommerce' );
       
@@ -125,11 +157,20 @@ EOT;
     function meta_box_settings() {
       if( isset( $_POST[ 'update' ] ) ) {
         update_option( "cmlwoo_translate_slugs", intval( @$_POST[ 'translate-slugs' ] ) );
+        update_option( 'cmlwoo_translate_permalink', intval( @$_POST[ 'translate-permalink' ] ) );
       }
 ?>
 	  <div id="minor-publishing">
         <form method="post">
           <input type="hidden" name="update" value="1" />
+          
+          <div class="cml-checkbox">
+            <input type="checkbox" id="translate-permalink" name="translate-permalink" value="1" <?php checked( get_option( 'cmlwoo_translate_permalink', 1 ) ) ?> />
+            <label for="translate-permalink"><span>||</span></label>
+          </div>
+          <label for="translate-permalink"><?php _e( 'Translate product permalink', 'cml4woo' ) ?>&nbsp;</label>
+
+          <br /><br />
           <div class="cml-checkbox">
             <input type="checkbox" id="translate-slugs" name="translate-slugs" value="1" <?php checked( get_option( 'cmlwoo_translate_slugs', 1 ) ) ?> />
             <label for="translate-slugs"><span>||</span></label>
@@ -168,6 +209,19 @@ EOT;
 		$tabs = "";
 		$short_tabs = "";
 		$editors = "";
+        $permalinks = "";
+
+        $_ok = __( 'Ok' );
+        $_cancel = __( 'Cancel' );
+        $_edit = __( 'Edit' );
+        $_original = __( 'Default', 'ceceppaml' );
+        $_or_tooltip = __( 'Use default permalink', 'ceceppaml' );
+
+        $url = "";
+        
+        $woop = get_option( 'woocommerce_permalinks', array() );
+        $slug = @$woop[ 'product_base' ];
+        if( empty( $slug ) ) $slug = "product";
 
 		foreach( CMLLanguage::get_all() as $lang ) {
 			$label = sprintf( __( 'Product name in %s', 'cml4woo' ), $lang->cml_language );
@@ -189,6 +243,28 @@ $titles .= <<< EOT
 	<img class="tipsy-s" title="$label" src="$img" />
 	<label class="" id="title-prompt-text" for="title_$lang->id">$label</label>
 	<input type="text" class="cmlwoo-title" name="cml_post_title_$lang->id" size="30" id="title_$lang->id" autocomplete="off" value="$title"/>
+</div>
+EOT;
+
+              $permalink = CMLTranslations::get( $lang->id, "_product_" . intval( $_GET[ 'post' ] ), "_woo_", true, true );
+              if( empty( $permalink ) ) {
+                //$permalink = sanitize_title( get_the_title() );
+              }
+
+              $url = CMLUtils::get_home_url( $lang->cml_language_slug ) . "$slug";
+$permalinks .= <<< EOT
+<div id="edit-slug-box" class="cml-permalink hide-if-no-js" cml-lang="$lang->id">
+    <input type="hidden" name="custom_permalink_$lang->id" class="custom-permalink" value="$permalink" />
+	<strong><img class="tipsy-s" title="$label" src="$img" /></strong>
+    <span id="sample-permalink" tabindex="-1">$url/<span id="editable-post-name">$permalink</span>/</span>
+    ‎<span id="edit-slug-buttons">
+      <a href="#post_name" class="edit-slug button button-small hide-if-no-js">$_edit</a>
+      <a href="javascript:void(0)" class="cml-hidden save button button-small">$_ok</a>
+      <a class="cancel cml-hidden" href="javascript:void()">$_cancel</a>
+      <a class="original button button-primary button-small tipsy-s" href="#default_permalink" title="$_or_tooltip">$_original</a>
+    </span>
+    <span id="view-post-btn" class="cml-view-product"><a href="javascript:void(0)" class="button button-small" target="_blank">Vedi Prodotto</a></span>
+    <span class="spinner cmlwoo-spinner">&nbsp;</span>
 </div>
 EOT;
 			}
@@ -234,6 +310,7 @@ EOT;
 		}
 
 		echo $titles;
+        echo $permalinks;
 
 		echo '<h2 class="nav-tab-wrapper cmlwoo-nav-tab">&nbsp;&nbsp;';
 		echo $tabs;
@@ -265,8 +342,12 @@ EOT;
 			 * Store titles in ceceppa ml tables, and I'll use them
 			 * in change_product_name function
 			 */
-			$product = strtolower( sanitize_title( $title ) );
-			CMLTranslations::set( $lang->id, "_" . $post->post_type . "_" . $post->ID, $product, "_woo_" );
+            $product = $_POST[ 'custom_permalink_' . $lang->id ];
+            if( empty( $product ) ) {
+              $product = $title;
+            }
+
+			CMLTranslations::set( $lang->id, "_" . $post->post_type . "_" . $post->ID, sanitize_title( $product ), "_woo_" );
 
 			$meta = array( 'title' => $title,
 											'content' => $content,
@@ -290,6 +371,9 @@ EOT;
 		}
 
 		update_option( "cml_woo_indexes", $ids );
+        
+      
+      cml_generate_mo_from_translations( "_X_", false );
 	}
 
 	function delete_meta( $id ) {
@@ -328,10 +412,10 @@ EOT;
       }
 
       $types[ "_cml4woo_attr" ] = "Woocommerce: Custom attributes";
-      
+
       return $types;
     }
-    
+
     function hide_default_lang( $array ) {
       $array[] = '_cml4woo_attr';
       
@@ -348,5 +432,24 @@ EOT;
       }
       
       return $label;
+    }
+    
+    function save_permalink() {
+      if( ! check_ajax_referer( "ceceppaml-nonce", "secret" ) ) {
+        die( "-1" );
+      }
+
+      $title = sanitize_title( $_POST[ 'permalink' ] );
+      echo sanitize_title( $title );
+
+      if( empty( $title ) ) {
+        $title = sanitize_title( get_the_title( $_POST[ 'post_ID' ] ) );
+      }
+
+      if( ! empty( $title ) ) {
+        CMLTranslations::set( $_POST[ 'lang' ], "_" . $_POST[ 'post_type' ] . "_" . $_POST[ 'post_ID' ], $title, "_woo_" );
+      }
+
+      die();
     }
 }

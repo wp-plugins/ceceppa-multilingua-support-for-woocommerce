@@ -49,3 +49,18 @@ h2.cmlwoo-nav-tab {
 .cmlwoo-editor-wrapper .mce-edit-area {
 	height: 433px !important;
 }
+
+.cml-permalink {
+  margin-left: 48px;
+}
+
+  .cml-permalink > strong img {
+    padding-right: 5px;
+    opacity: 0.6;
+  }
+
+
+.cmlwoo-spinner {
+  float: none !important;
+  margin: 0 !important;
+}

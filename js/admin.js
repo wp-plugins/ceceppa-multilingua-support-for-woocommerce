@@ -46,6 +46,106 @@ jQuery( document ).ready( function( $ ) {
     $( 'th .cml-remove' ).each( function() {
       $( this ).parents( 'tr' ).remove();
     });
+    
+    //Edit permalink
+    $( 'body' ).on( 'click', '.cml-permalink #edit-slug-buttons .edit-slug, .cml-permalink #editable-post-name', function() {
+      $sample = $( this ).parents( '.cml-permalink' ).find( '#editable-post-name' );
+      if ( $sample.find( 'input' ).length > 0 ) {
+        return;
+      }
+
+      $sample.attr( 'original-slug', $sample.html() );
+
+      $input = '<input type="text" id="new-post-slug" value="' + $sample.html() + '" />';
+      $sample.html( $input );
+      
+      $( this ).parents( '.cml-permalink' ).find( '.cml-view-product' ).hide();
+      $( this ).parents( '.cml-permalink' ).find( '#edit-slug-buttons *' ).addClass( 'cml-hidden' );
+      $( this ).parents( '.cml-permalink' ).find( '#edit-slug-buttons .save, #edit-slug-buttons .cancel' ).removeClass( 'cml-hidden' );
+    });
+
+    //Cancel edit permalink
+    $( 'body' ).on( 'click', '.cml-permalink #edit-slug-buttons .cancel', function() {
+      $sample = $( this ).parents( '.cml-permalink' ).find( '#editable-post-name' );
+
+      $sample.html( $sample.attr( 'original-slug' ) );
+      
+      $( this ).parent().find( '*' ).addClass( 'cml-hidden' );
+      $( this ).parent().find( '.edit-slug, .original' ).removeClass( 'cml-hidden' );
+      $( this ).parents( '.cml-permalink' ).find( '.cml-view-product' ).show();
+      
+      $parent.find( '.custom-permalink' ).val( $sample.attr( 'original-slug' ) );
+      $parent.find( '.spinner' ).css( 'display', 'none' );
+    });
+
+    $( 'body' ).on( 'click', '.cml-permalink #edit-slug-buttons .cancel', function() {
+      
+    });
+
+    //use default permalink
+    $( 'body' ).on( 'click', '.cml-permalink #edit-slug-buttons .original', function() {
+      $sample = $( this ).parents( '.cml-permalink' ).find( '#editable-post-name' );
+      
+      $span = $( '.inside > #edit-slug-box' ).first().find( '#editable-post-name' );
+      var permalink = $span.html();
+      if ( $span.find( 'input' ).length > 0 ) {
+        permalink = $span.find( 'input' ).val();
+      }
+
+      $( this ).parents( '.cml-permalink' ).find( '.custom-permalink' ).val( permalink );
+      $sample.html( permalink );
+    });
+
+    //confirm permalink
+    $( 'body' ).on( 'click', '.cml-permalink #edit-slug-buttons .save', function() {
+      $parent = $( this ).parents( '.cml-permalink' );
+      
+      $( this ).parent().find( '*' ).addClass( 'cml-hidden' );
+      $parent.find( '.spinner' ).css( 'display', 'inline-block' );
+      
+      var lang = $parent.attr( 'cml-lang' );
+      permalink = $parent.find( '#new-post-slug' ).val();
+      if ( permalink.trim() == '' ) {
+        permalink = $( 'input[name="cml_post_title_' + lang  + '"]' ).val();
+      }
+
+        if ( permalink.trim() == '' ) {
+          permalink = $( 'input[name="post_title"]' ).val();
+        }
+
+      var data = {
+		action: 'cmlwoo_save_permalink',
+		secret: ceceppaml_admin.secret,
+        lang: lang,
+        permalink: permalink,
+        post_type: $( 'form[name="post"] input#post_type' ).val(),
+        post_ID: $( 'form[name="post"] input#post_ID' ).val()
+      };
+
+      $.post( ajaxurl, data, function(response) {
+        if ( response == -1 ) {
+          alert( 'Something goes wrong' );
+
+          $parent.find( '.cancel' ).trigger( 'click' );
+          return;
+        }
+        
+        $parent.find( '#editable-post-name' ).attr( 'original-slug', response );
+        $parent.find( '.cancel' ).trigger( 'click' );
+      });
+    });
+    
+    //view product
+    $( 'body' ).on( 'click', '.cml-permalink .cml-view-product', function() {
+      var link = $( this ).parents( '.cml-permalink' ).find( '#sample-permalink' ).html();
+      var pattern = /[^<]*/
+      
+      link = link.match( pattern );
+      link += $( this ).parents( '.cml-permalink' ).find( '#sample-permalink' ).find( 'span' ).html();
+
+      //Open product in new tab
+      window.open( link,'_blank' );
+    });
 });
 
 var CmlWoo = {
