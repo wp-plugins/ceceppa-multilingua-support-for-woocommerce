@@ -1,4 +1,4 @@
-=== Ceceppa Multilingua support to WooCommerce ===
+=== Ceceppa Multilingua support for WooCommerce ===
 Contributors: ceceppa
 Tags: multilingual, language, admin, tinymce, bilingual, widget, switcher, i18n, l10n, multilanguage, professional, translation, service, human, qtranslate, wpml, ztranslate, xtranslate, international, .mo file, .po file, localization, widget, post, woocommerce
 Requires at least: 3.4.1
@@ -24,6 +24,9 @@ It makes products and store pages translatable, lets visitors switch languages a
 = Requires =
 
 Ceceppa Multilingua >= 1.4.17
+
+= Demo =
+[Demo store](http://test.alessandrosenese.eu/it/)
 
 = About =
 For more Information visit the [Plugin Homepage](http://www.alessandrosenese.eu/en/ceceppa-multilingua/ceceppa-multilingua-for-woocommerce)
