@@ -3,7 +3,7 @@ Contributors: ceceppa
 Tags: multilingual, language, admin, tinymce, bilingual, widget, switcher, i18n, l10n, multilanguage, professional, translation, service, human, qtranslate, wpml, ztranslate, xtranslate, international, .mo file, .po file, localization, widget, post, woocommerce
 Requires at least: 3.4.1
 Tested up to: 3.9
-Stable tag: 0.2
+Stable tag: 0.3
 License: GPLv3 or later
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -50,6 +50,9 @@ Installation of this plugin is fairly easy:
 2. Product short description translation
 
 == Changelog ==
+
+= 0.3 =
+* Fix number version in wp repository 
 
 = 0.2 =
 * Allow permalink customization for each language

@@ -3,7 +3,7 @@
 Plugin Name: Ceceppa Multilingua support for Woocommerce
 Plugin URI: http://www.ceceppa.eu/portfolio/ceceppa-multilingua/
 Description: Plugin to make Ceceppa Multilingua work with Woocommerce.\nThis plugin required Ceceppa Multilingua 1.4.10.
-Version: 0.2
+Version: 0.3
 Author: Alessandro Senese aka Ceceppa
 Author URI: http://www.alessandrosenese.eu/
 License: GPL3
