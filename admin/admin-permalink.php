@@ -41,6 +41,8 @@ class Cml4WoocommercePermalink {
   }
   
   function settings_save() {
+    if( ! defined( 'CECEPPA_DB_VERSION' ) ) return;
+
     if ( isset( $_POST['permalink_structure'] ) ||
          isset( $_POST['category_base'] ) &&
          isset( $_POST['product_permalink'] ) ) {

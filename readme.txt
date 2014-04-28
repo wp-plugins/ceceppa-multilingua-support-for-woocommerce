@@ -26,6 +26,7 @@ It makes products and store pages translatable, lets visitors switch languages a
 Ceceppa Multilingua >= 1.4.17
 
 = Demo =
+
 [Demo store](http://test.alessandrosenese.eu/it/)
 
 = About =

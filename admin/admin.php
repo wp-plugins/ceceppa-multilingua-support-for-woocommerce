@@ -96,7 +96,8 @@ EOT;
       
       //Empty base structure ( permalink )
       $woop = get_option( 'woocommerce_permalinks', array() );
-      if( ! isset( $woop[ 'category_base' ] ) || empty( $woop[ 'category_base' ] ) ) {
+      if( defined( 'WC_VERSION' ) &&
+	  ! isset( $woop[ 'category_base' ] ) || empty( $woop[ 'category_base' ] ) ) {
 ?>
 	<div class="error">
 		<p>
@@ -110,7 +111,8 @@ EOT;
 <?php
       }
 
-      if( ! isset( $woop[ 'tag_base' ] ) || empty( $woop[ 'tag_base' ] ) ) {
+      if( defined( 'WC_VERSION' ) &&
+	  ! isset( $woop[ 'tag_base' ] ) || empty( $woop[ 'tag_base' ] ) ) {
 ?>
 	<div class="error">
 		<p>
