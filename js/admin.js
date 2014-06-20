@@ -70,6 +70,7 @@ jQuery( document ).ready( function( $ ) {
 
       $sample.html( $sample.attr( 'original-slug' ) );
       
+      $parent = $( this ).parent();
       $( this ).parent().find( '*' ).addClass( 'cml-hidden' );
       $( this ).parent().find( '.edit-slug, .original' ).removeClass( 'cml-hidden' );
       $( this ).parents( '.cml-permalink' ).find( '.cml-view-product' ).show();

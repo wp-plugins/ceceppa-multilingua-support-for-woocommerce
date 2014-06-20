@@ -8,6 +8,7 @@ class Cml4WoocommerceAdmin extends Cml4Woocommerce {
       parent::__construct();
 
       global $pagenow;
+
       if( 'options-permalink.php' == $pagenow ) {
         new Cml4WoocommercePermalink();
       }
@@ -38,7 +39,7 @@ class Cml4WoocommerceAdmin extends Cml4Woocommerce {
       add_filter( 'cml_my_translations_label', array( & $this, 'change_label' ), 10, 2 );
 
       //Wp style & script
-      add_action( 'admin_enqueue_scripts', array( & $this, 'enqueue_style' ), 10 );
+      add_action( 'admin_enqueue_scripts', array( & $this, 'enqueue_style' ) );
 
       //show translate title in product page
       if( isset( $_GET[ 'post_type' ] ) &&

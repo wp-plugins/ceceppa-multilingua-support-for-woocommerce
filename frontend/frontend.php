@@ -7,6 +7,9 @@ class Cml4WoocommerceFrontend extends Cml4Woocommerce {
 	public function __construct() {
     parent::__construct();
 
+    //Update woocommerce shop & myaccount page
+    add_action( 'cml_language_detected', array( & $this, 'update_woo_pages_id' ), 10, 1 );
+
     //Translate product link
     if( get_option( 'cmlwoo_translate_permalink', 1 ) ) {
       add_filter( 'post_type_link', array( & $this, 'translate_product_link' ), 10, 4 );
@@ -20,6 +23,8 @@ class Cml4WoocommerceFrontend extends Cml4Woocommerce {
     add_filter( 'woocommerce_cart_item_name', array( & $this, 'get_translated_title' ), 10, 3 );
     add_filter( 'the_content', array( & $this, 'get_translated_content' ), 0, 1 );
     add_filter( 'woocommerce_short_description', array( & $this, 'get_translated_description' ), 0, 1 );
+    add_filter( 'woocommerce_get_cart_url', array( & $this, 'get_cart_url' ), 0, 1 );
+    add_filter( 'woocommerce_get_checkout_url', array( & $this, 'get_checkout_url' ), 0, 1 );
 
     /*
      * When I translate category url I have to inform wordpress which is "original" category.
@@ -28,9 +33,10 @@ class Cml4WoocommerceFrontend extends Cml4Woocommerce {
      *
      * is_woocommerce_tag detect if current url is a woocommerce category
      */
-    add_filter( 'cml_is_custom_category', array( & $this, 'is_woocommerce_category' ), 10, 2 );
-    add_filter( 'cml_custom_category_name', array( & $this, 'get_category_name' ), 10, 2 );
-    add_filter( 'cml_change_wp_query_values', array( & $this, 'change_wp_query_values' ), 10, 2 );
+    //add_filter( 'cml_is_custom_category', array( & $this, 'is_woocommerce_category' ), 10, 2 );
+    //add_filter( 'cml_custom_category_name', array( & $this, 'get_category_name' ), 10, 2 );
+    //add_filter( 'cml_get_custom_taxonomy', array( & $this, 'get_product_taxonomy' ), 10, 2 );
+    //add_filter( 'cml_change_wp_query_values', array( & $this, 'change_wp_query_values' ), 10, 2 );
 
     //Translate cart product title
     add_filter( 'woocommerce_cart_item_product', array( & $this, 'translate_product' ), 10, 3 );
@@ -50,6 +56,38 @@ class Cml4WoocommerceFrontend extends Cml4Woocommerce {
   
       //translate category title in flag link
       add_filter( 'cml_get_the_link', array( & $this, 'translate_category_link' ), 10, 4 );
+    }
+
+    //Wp style & script
+    add_action( 'wp_enqueue_scripts', array( & $this, 'enqueue_script' ), 10 );
+  }
+
+  function update_woo_pages_id( $lang ) {
+    $this->update_shop_page_id( $lang );
+    $this->update_myaccount_page_id( $lang );
+  }
+
+  function update_shop_page_id( $lang ) {
+    if( ! isset( $this->_woo_shop_id ) ) {
+      $this->_woo_shop_id = get_option( 'woocommerce_shop_page_id' );
+    }
+
+    $nid = CMLPost::get_translation( $lang, $this->_woo_shop_id );
+    
+    if( $nid > 0 ) {
+      update_option( 'woocommerce_shop_page_id', $nid );
+    }
+  }
+
+  function update_myaccount_page_id( $lang ) {
+    if( ! isset( $this->_woo_myaccount_id ) ) {
+      $this->_woo_myaccount_id = get_option( 'woocommerce_myaccount_page_id' );
+    }
+
+    $nid = CMLPost::get_translation( $lang, $this->_woo_myaccount_id );
+    
+    if( $nid > 0 ) {
+      update_option( 'woocommerce_myaccount_page_id', $nid );
     }
   }
 
@@ -118,7 +156,7 @@ class Cml4WoocommerceFrontend extends Cml4Woocommerce {
   function change_product_name( $wp_query ) {
     global $wpdb;
 
-    if( ! defined( 'CECEPPA_DB_VERSION' ) ) return;
+    if( ! defined( 'CECEPPA_DB_VERSION' ) || ! function_exists( 'cml_is_homepage' ) ) return;
 
     if( cml_is_homepage() ||
       CMLLanguage::is_default() ||
@@ -137,11 +175,11 @@ class Cml4WoocommerceFrontend extends Cml4Woocommerce {
     $id = end( $out );
     $post = get_post( $id );
 
-    $wp_query->query[ 'product' ] = $post->post_title; 
-    $wp_query->query[ 'name' ] = $post->post_title; 
+    $wp_query->query[ 'product' ] = $post->post_name; 
+    $wp_query->query[ 'name' ] = $post->post_name; 
 
-    $wp_query->query_vars[ 'product' ] = $post->post_title; 
-    $wp_query->query_vars[ 'name' ] = $post->post_title;
+    $wp_query->query_vars[ 'product' ] = $post->post_name; 
+    $wp_query->query_vars[ 'name' ] = $post->post_name;
   }
 
   /*
@@ -164,6 +202,14 @@ class Cml4WoocommerceFrontend extends Cml4Woocommerce {
       }
 
       return $wp_query->query[ 'product_cat' ];
+  }
+
+  function get_product_taxonomy( $tax, $wp_query ) {
+    if( $this->is_woocommerce_category( false, $wp_query ) ) {
+      return "product_cat";
+    }
+    
+    return $tax;
   }
 
   /*
@@ -293,6 +339,46 @@ class Cml4WoocommerceFrontend extends Cml4Woocommerce {
     $l[ 0 ] = $base;
 
     return $home . join( "/", $l );
+  }
+
+  function get_cart_url( $permalink ) {
+    if( ! defined( 'CECEPPA_DB_VERSION' ) ) return $permalink;
+    if( CMLLanguage::is_default() ) return $permalink;
+    
+    if( ! isset( $this->_woo_cart_id ) ) {
+      $this->_woo_cart_id = get_option( 'woocommerce_cart_page_id' );
+    }
+
+    $id = CMLPost::get_translation( CMLLanguage::get_current(),
+                                    $this->_woo_cart_id );
+
+    if( $id > 0 ) {
+      return get_permalink( $id );
+    } else {
+      return $permalink;
+    }
+  }
+  
+  function get_checkout_url( $permalink ) {
+    if( ! defined( 'CECEPPA_DB_VERSION' ) ) return $permalink;
+    if( CMLLanguage::is_default() ) return $permalink;
+    
+    if( ! isset( $this->_woo_checkout_id ) ) {
+      $this->_woo_checkout_id = get_option( 'woocommerce_checkout_page_id' );
+    }
+
+    $id = CMLPost::get_translation( CMLLanguage::get_current(),
+                                    $this->_woo_checkout_id );
+
+    if( $id > 0 ) {
+      return get_permalink( $id );
+    } else {
+      return $permalink;
+    }
+  }
+  
+  function enqueue_script() {
+    wp_enqueue_script( 'cmlwoocommerce-frontend', CML_WOOCOMMERCE_URL . 'js/frontend.js' );
   }
 }
 
