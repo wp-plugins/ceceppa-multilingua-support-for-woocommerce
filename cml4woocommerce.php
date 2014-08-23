@@ -28,7 +28,7 @@ class Cml4Woocommerce {
     
     $this->_indexes = get_option( "cml_woo_indexes", array() );
 
-    add_action( 'init', array( & $this, 'rewrite_rules' ), 10 );
+    add_action( 'init', array( & $this, 'rewrite_rules' ), 99 );
   }
 
   /*
@@ -110,4 +110,3 @@ if( is_admin() ) {
 } else {
 	$cml4woocommerce = new Cml4WoocommerceFrontend();
 }
-?>

@@ -26,6 +26,12 @@ class Cml4WoocommerceFrontend extends Cml4Woocommerce {
     add_filter( 'woocommerce_get_cart_url', array( & $this, 'get_cart_url' ), 0, 1 );
     add_filter( 'woocommerce_get_checkout_url', array( & $this, 'get_checkout_url' ), 0, 1 );
 
+    //is woocommerce special page?
+    add_filter( 'cml_is_special_page', array( & $this, 'is_woocommerce_page' ), 0, 1 );
+
+    //Thank you page
+    add_action( 'woocommerce_thankyou', 'my_custom_tracking' );
+
     /*
      * When I translate category url I have to inform wordpress which is "original" category.
      * I can't use is_category for translated url of custom categories, so I have to use
@@ -85,7 +91,7 @@ class Cml4WoocommerceFrontend extends Cml4Woocommerce {
     }
 
     $nid = CMLPost::get_translation( $lang, $this->_woo_myaccount_id );
-    
+
     if( $nid > 0 ) {
       update_option( 'woocommerce_myaccount_page_id', $nid );
     }
@@ -267,6 +273,7 @@ class Cml4WoocommerceFrontend extends Cml4Woocommerce {
   }
 
   function translate_items_name( $items ) {
+    if( ! defined( 'CECEPPA_DB_VERSION' ) ) return $items;
     if( CMLLanguage::is_default() ) return $items;
 
     foreach( $items as $key => $item ) {
@@ -285,6 +292,8 @@ class Cml4WoocommerceFrontend extends Cml4Woocommerce {
   }
   
   function checkout_form( $checkout ) {
+    if( ! defined( 'CECEPPA_DB_VERSION' ) ) return $permalink;
+
     echo '<input type="hidden" name="lang" value="' . CMLLanguage::get_current()->cml_locale . '" />';
 
     return $checkout;
@@ -380,6 +389,11 @@ class Cml4WoocommerceFrontend extends Cml4Woocommerce {
   function enqueue_script() {
     wp_enqueue_script( 'cmlwoocommerce-frontend', CML_WOOCOMMERCE_URL . 'js/frontend.js' );
   }
+    
+  //Check if current page is a woocommerce page
+  function is_woocommerce_page( $filter ) {
+      return ( is_woocommerce() ) ? true : $filter;
+  }
 }
 
 /*
@@ -403,4 +417,7 @@ $pages = array( 'cart', 'product', 'myaccount', 'shop', 'change_password', 'chec
 foreach( $pages as $page ) {
   add_filter( 'woocommerce_get_' . $page . '_page_id', 'cmlwoo_get_translated_page_id', 10, 1 );
 }
-?>
+
+function my_custom_tracking() {
+    echo "zk thanks";
+}
