@@ -39,10 +39,10 @@ class Cml4WoocommerceFrontend extends Cml4Woocommerce {
      *
      * is_woocommerce_tag detect if current url is a woocommerce category
      */
-    //add_filter( 'cml_is_custom_category', array( & $this, 'is_woocommerce_category' ), 10, 2 );
-    //add_filter( 'cml_custom_category_name', array( & $this, 'get_category_name' ), 10, 2 );
-    //add_filter( 'cml_get_custom_taxonomy', array( & $this, 'get_product_taxonomy' ), 10, 2 );
-    //add_filter( 'cml_change_wp_query_values', array( & $this, 'change_wp_query_values' ), 10, 2 );
+    add_filter( 'cml_is_custom_category', array( & $this, 'is_woocommerce_category' ), 10, 2 );
+    add_filter( 'cml_custom_category_name', array( & $this, 'get_category_name' ), 10, 2 );
+    add_filter( 'cml_get_custom_taxonomy', array( & $this, 'get_product_taxonomy' ), 10, 2 );
+    add_filter( 'cml_change_wp_query_values', array( & $this, 'change_wp_query_values' ), 10, 2 );
 
     //Translate cart product title
     add_filter( 'woocommerce_cart_item_product', array( & $this, 'translate_product' ), 10, 3 );
@@ -55,7 +55,7 @@ class Cml4WoocommerceFrontend extends Cml4Woocommerce {
     add_action( 'cml_is_single_page', array( & $this, 'is_shop_page' ), 10, 2 );
     add_action( 'cml_get_custom_page_id', array( & $this, 'get_shop_page_id' ), 10, 2 );
     
-    if( get_option( "cmlwoo_translate_slugs" ) ) {
+    if( get_option( "cmlwoo_translate_slugs", true ) ) {
       //translate category url
       add_filter( 'woocommerce_taxonomy_args_product_cat', array( & $this, 'get_translated_cat_slug' ), 10, 1 );
       add_filter( 'woocommerce_taxonomy_args_product_tag', array( & $this, 'get_translated_tag_slug' ), 10, 1 );
