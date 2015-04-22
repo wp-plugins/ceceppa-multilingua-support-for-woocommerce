@@ -17,16 +17,16 @@ class Cml4WoocommerceAdmin extends Cml4Woocommerce {
 
       add_action( 'admin_notices', array( & $this, 'admin_notices' ) );
       add_action( 'admin_init', array( & $this, 'add_meta_box' ) );
-  
+
       //Add addon in "Addons page"
       add_action( 'cml_register_addons', array( & $this, 'register_addon' ), 10, 1 );
 
       //Tell to CML to ingnore woocommerce post types, so "Post data" box will not be displayed
       add_filter( 'cml_manage_post_types', array( & $this, 'remove_woocommerce_types' ) );
-  
+
       //Post title e editors
       add_action( 'edit_form_after_title', array( & $this, 'insert_title_translations' ), 10, 1 );
-  
+
       //Save translations in post_meta
       add_action( 'save_post', array( & $this, 'save_translations' ), 10, 2 );
       add_action( 'delete_post', array( & $this, 'delete_meta' ), 10, 1 );
@@ -51,7 +51,7 @@ class Cml4WoocommerceAdmin extends Cml4Woocommerce {
 
 	function enqueue_style() {
       wp_enqueue_style( 'cmlwoocommerce-style', CML_WOOCOMMERCE_URL . 'css/admin.css' );
-  
+
       wp_enqueue_script( 'cmlwoocommerce-admin', CML_WOOCOMMERCE_URL . 'js/admin.js' );
 	}
 
@@ -80,7 +80,7 @@ echo <<< EOT
 EOT;
         return;
       }
-      
+
       if( 'edit.php' == $pagenow &&
          'product_attributes' == @$_GET[ 'page' ] ) {
 ?>
@@ -94,7 +94,7 @@ EOT;
       </div>
 <?php
       }
-      
+
       //Empty base structure ( permalink )
       $woop = get_option( 'woocommerce_permalinks', array() );
       if( defined( 'WC_VERSION' ) &&
@@ -129,14 +129,14 @@ EOT;
 	}
 
 	function add_meta_box() {
-      add_meta_box( 'cml-box-cml4woo-addons', 
-                                  __( 'WooCommerce', 'woocommerce' ), 
-                                  array( & $this, 'meta_box' ), 
+      add_meta_box( 'cml-box-cml4woo-addons',
+                                  __( 'WooCommerce', 'woocommerce' ),
+                                  array( & $this, 'meta_box' ),
                                   'cml_box_addons_woocommerce' );
-      
-      add_meta_box( 'cml-box-cml4woo-settings-addons', 
-                                  __( 'Settings', 'cml4woo' ), 
-                                  array( & $this, 'meta_box_settings' ), 
+
+      add_meta_box( 'cml-box-cml4woo-settings-addons',
+                                  __( 'Settings', 'cml4woo' ),
+                                  array( & $this, 'meta_box_settings' ),
                                   'cml_box_addons_woocommerce' );
 	}
 
@@ -156,7 +156,7 @@ EOT;
       </div>
 <?php
     }
-    
+
     function meta_box_settings() {
       if( isset( $_POST[ 'update' ] ) ) {
         update_option( "cmlwoo_translate_slugs", intval( @$_POST[ 'translate-slugs' ] ) );
@@ -166,7 +166,7 @@ EOT;
 	  <div id="minor-publishing">
         <form method="post">
           <input type="hidden" name="update" value="1" />
-          
+
           <div class="cml-checkbox">
             <input type="checkbox" id="translate-permalink" name="translate-permalink" value="1" <?php checked( get_option( 'cmlwoo_translate_permalink', 1 ) ) ?> />
             <label for="translate-permalink"><span>||</span></label>
@@ -179,7 +179,7 @@ EOT;
             <label for="translate-slugs"><span>||</span></label>
           </div>
           <label for="translate-slugs"><?php _e( 'Translate product category and tag base', 'cml4woo' ) ?>&nbsp;</label>
-          
+
           <div class="cml-submit-button">
             <?php submit_button() ?>
           </div>
@@ -221,7 +221,7 @@ EOT;
         $_or_tooltip = __( 'Use default permalink', 'ceceppaml' );
 
         $url = "";
-        
+
         $woop = get_option( 'woocommerce_permalinks', array() );
         $slug = @$woop[ 'product_base' ];
         if( empty( $slug ) ) $slug = "product";
@@ -274,7 +274,7 @@ EOT;
 
 			$active = ( $lang->cml_default ) ? "nav-tab-active" : "";
 
-			if( ! $lang->cml_default )  {	
+			if( ! $lang->cml_default )  {
 				echo '<div id="cmlwoo-editor" class="cmlwoo-editor-' . $lang->id . ' cmlwoo-editor-wrapper cml-hidden postarea edit-form-section">';
 					wp_editor( htmlspecialchars_decode( $content ), "cml_content_" . $lang->id );
 				echo '</div>';
@@ -374,8 +374,8 @@ EOT;
 		}
 
 		update_option( "cml_woo_indexes", $ids );
-        
-      
+
+
       cml_generate_mo_from_translations( "_X_", false );
 	}
 
@@ -387,7 +387,7 @@ EOT;
 		$post = get_post( $id );
 		CMLTranslations::delete_text( "_" . $post->post_type . "_" . $post->ID, "_woo_" );
 	}
-    
+
     function update_product_language() {
       $args=array(
         'post_type' => 'product',
@@ -401,10 +401,10 @@ EOT;
 
         CMLPost::set_language( 0, $id );
       }
-      
+
       cml_generate_mo_from_translations();
     }
-    
+
     function custom_attributes( $types ) {
       global $wpdb;
 
@@ -421,22 +421,22 @@ EOT;
 
     function hide_default_lang( $array ) {
       $array[] = '_cml4woo_attr';
-      
+
       return $array;
     }
 
     //remove id from label
     function change_label( $label, $type ) {
       if( '_cml4woo_attr' !== $type ) return $label;
-      
+
       preg_match( '/(\d*)_(.*)/', $label, $match );
       if( count( $match ) == 3 )  {
         return $match[ 2 ];
       }
-      
+
       return $label;
     }
-    
+
     function save_permalink() {
       if( ! check_ajax_referer( "ceceppaml-nonce", "secret" ) ) {
         die( "-1" );
