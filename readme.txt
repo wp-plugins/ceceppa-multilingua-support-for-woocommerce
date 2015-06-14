@@ -2,8 +2,8 @@
 Contributors: ceceppa
 Tags: multilingual, language, admin, tinymce, bilingual, widget, switcher, i18n, l10n, multilanguage, professional, translation, service, human, qtranslate, wpml, ztranslate, xtranslate, international, .mo file, .po file, localization, widget, post, woocommerce
 Requires at least: 3.4.1
-Tested up to: 4.0
-Stable tag: 0.6
+Tested up to: 4.2
+Stable tag: 0.8
 License: GPLv3 or later
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -36,8 +36,8 @@ For more Information visit the [Plugin Homepage](http://www.alessandrosenese.eu/
 
 Installation of this plugin is fairly easy:
 
-1. Download the plugin from wordpress. 
-1. Extract all the files. 
+1. Download the plugin from wordpress.
+1. Extract all the files.
 1. Upload everything (keeping the directory structure) to the `/wp-content/plugins/` directory.
 1. Activate the plugin through the 'Plugins' menu in WordPress.
 1. Manage desidered languages
@@ -51,10 +51,13 @@ Installation of this plugin is fairly easy:
 
 == Changelog ==
 
+= 0.8 =
+* Fixed issue when storing custom post slug
+
 = 0.6 =
 * Fixed 404 error with translated product categories
 
-= 0.4 = 
+= 0.4 =
 * Fixed 404 error on checkout/order-received page
 
 = 0.2 =

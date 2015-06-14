@@ -3,7 +3,7 @@
 Plugin Name: Ceceppa Multilingua support for Woocommerce
 Plugin URI: http://www.ceceppa.eu/portfolio/ceceppa-multilingua/
 Description: Plugin to make Ceceppa Multilingua work with Woocommerce.\nThis plugin required Ceceppa Multilingua 1.4.10.
-Version: 0.6
+Version: 0.8
 Author: Alessandro Senese aka Ceceppa
 Author URI: http://www.alessandrosenese.eu/
 License: GPL3
@@ -25,7 +25,7 @@ class Cml4Woocommerce {
   public function __construct() {
     //Woocommerce post types
     $this->_post_types = array( 'product', 'product_variation', 'shop_order', 'shop_coupon' );
-    
+
     $this->_indexes = get_option( "cml_woo_indexes", array() );
 
     add_action( 'init', array( & $this, 'rewrite_rules' ), 99 );
@@ -48,13 +48,13 @@ class Cml4Woocommerce {
 
     foreach( CMLLanguage::get_no_default() as $lang ) {
       if( ! isset( $permalinks[ $lang->id ] ) ) continue;
-      
+
       foreach( $slugs as $slug ) {
         if( empty( $permalinks[ $lang->id ][ $slug ] ) ) continue;
 
         $category = $permalinks[ $lang->id ][ $slug ];
         if( $category == $woo[ $slug ] ) continue;
-  
+
         add_rewrite_rule( $category . '/(.+?)/feed/(feed|rdf|rss|rss2|atom)/?$','index.php?' . $type[ $slug ] . '=$matches[1]&feed=$matches[2]', 'top' );
         add_rewrite_rule( $category . '/(.+?)/(feed|rdf|rss|rss2|atom)/?$','index.php?' . $type[ $slug ] . '=$matches[1]&feed=$matches[2]', 'top' );
         add_rewrite_rule( $category . '/(.+?)/page/?([0-9]{1,})/?$','index.php?' . $type[ $slug ] . '=$matches[1]&paged=$matches[2]', 'top' );
@@ -84,7 +84,7 @@ class Cml4Woocommerce {
 
     return $title;
   }
-  
+
 
   function get_meta( $id = null ) {
     if( null == $id ) {
